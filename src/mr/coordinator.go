@@ -6,6 +6,33 @@ import "os"
 import "net/rpc"
 import "net/http"
 
+const TempDir = "tmp"
+const TaskTimeout = 10
+
+type TaskStatus int
+type TaskType int
+type JobStage int
+
+const (
+	MapTask TaskType = iota
+	ReduceTask
+	NoTask
+	ExitTask
+)
+
+const (
+	NotStarted TaskStatus = iota
+	Executing
+	Finished
+)
+
+type Task struct {
+	Type     TaskType
+	Status   TaskStatus
+	Index    int
+	File     string
+	WorkerId int
+}
 
 type Coordinator struct {
 	// Your definitions here.
@@ -78,17 +105,44 @@ func (c *Coordinator) ReportTaskDone(args *ReportTaskArgs, reply *ReportTaskRepl
 	return nil
 }
 
+func (c *Coordinator) selectTask(taskList [Task], workerId int) *Task {
+	var task *Task
+	
+	for i := 0; i < len(taskList); i++ {
+		if taskList[i].Status == NotStarted {
+			task = &taskList[i]
+			task.Status = Executing
+			task.workerId = workerId
+			return task
+		}
+	}
+}
 
+func (c *Coordinator) waitForTask(task *Task) {
+	if task.Type != MapTask && task.Type != ReduceTask {
+		return
+	}
+
+	<-time.After(time.Second * TaskTimeout)
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if task.Status == Executing {
+		task.Status == NotStarted
+		task.workerId == -1
+	}
+}
 
 //
 // an example RPC handler.
 //
 // the RPC argument and reply types are defined in rpc.go.
 //
-func (c *Coordinator) Example(args *ExampleArgs, reply *ExampleReply) error {
-	reply.Y = args.X + 1
-	return nil
-}
+// func (c *Coordinator) Example(args *ExampleArgs, reply *ExampleReply) error {
+// 	reply.Y = args.X + 1
+// 	return nil
+// }
 
 
 //
@@ -112,12 +166,15 @@ func (c *Coordinator) server() {
 // if the entire job has finished.
 //
 func (c *Coordinator) Done() bool {
-	ret := false
+	// ret := false
 
 	// Your code here.
 
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-	return ret
+	return m.mMap == 0 && m.nReduce == 0
+	// return ret
 }
 
 //
@@ -144,13 +201,25 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 		c.reduceTasks = append(c.reduceTasks, mTask)
 	}
 
-	c.server()
-
-
-
 	// Your code here.
 
 
 	c.server()
+
+	outFiles, _ := filepath.Glob("mr-out*")
+	for _, f := range outFiles {
+		if err := os.Remove(f); err != nil {
+			log.Fatalf("Cannot remove file %v\n", f)
+		}
+	}
+	err := os.RemoveAll(TempDir)
+	if err != nil {
+		log.Fatalf("Cannot remove temp directory %v\n", TempDir)
+	}
+	err = os.Mkdir(TempDir, 0755)
+	if err != nil {
+		log.Fatalf("Cannot create temp directory %v\n", TempDir)
+	}
+
 	return &c
 }
