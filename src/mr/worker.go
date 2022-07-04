@@ -192,7 +192,7 @@ func writeReduceOutput(reducef func(string, []string) string,
 func getReduceCount() (int, bool) {
 	args := GetReduceCountArgs{}
 	reply := GetReduceCountReply{}
-	succ := call("Master.GetReduceCount", &args, &reply)
+	succ := call("Coordinator.GetReduceCount", &args, &reply)
 
 	return reply.ReduceCount, succ
 }
@@ -200,7 +200,7 @@ func getReduceCount() (int, bool) {
 func requestTask() (*RequestTaskReply, bool) {
 	args := RequestTaskArgs{os.Getpid()}
 	reply := RequestTaskReply{}
-	succ := call("Master.RequestTask", &args, &reply)
+	succ := call("Coordinator.RequestTask", &args, &reply)
 
 	return &reply, succ
 }
@@ -208,7 +208,7 @@ func requestTask() (*RequestTaskReply, bool) {
 func reportTaskDone(taskType TaskType, taskId int) (bool, bool) {
 	args := ReportTaskArgs{os.Getpid(), taskType, taskId}
 	reply := ReportTaskReply{}
-	succ := call("Master.ReportTaskDone", &args, &reply)
+	succ := call("Coordinator.ReportTaskDone", &args, &reply)
 
 	return reply.CanExit, succ
 }
@@ -226,7 +226,7 @@ func checkError(err error, format string, v ...interface{}) {
 //
 func call(rpcname string, args interface{}, reply interface{}) bool {
 	// c, err := rpc.DialHTTP("tcp", "127.0.0.1"+":1234")
-	sockname := masterSock()
+	sockname := coordinatorSock()
 	c, err := rpc.DialHTTP("unix", sockname)
 	if err != nil {
 		log.Fatal("dialing:", err)

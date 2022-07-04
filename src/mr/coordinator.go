@@ -5,6 +5,10 @@ import "net"
 import "os"
 import "net/rpc"
 import "net/http"
+import "time"
+import "fmt"
+import "sync"
+import "path/filepath"
 
 const TempDir = "tmp"
 const TaskTimeout = 10
@@ -105,17 +109,18 @@ func (c *Coordinator) ReportTaskDone(args *ReportTaskArgs, reply *ReportTaskRepl
 	return nil
 }
 
-func (c *Coordinator) selectTask(taskList [Task], workerId int) *Task {
+func (c *Coordinator) selectTask(taskList []Task, workerId int) *Task {
 	var task *Task
 	
 	for i := 0; i < len(taskList); i++ {
 		if taskList[i].Status == NotStarted {
 			task = &taskList[i]
 			task.Status = Executing
-			task.workerId = workerId
+			task.WorkerId = workerId
 			return task
 		}
 	}
+	return &Task{NoTask, Finished, -1, "", -1}
 }
 
 func (c *Coordinator) waitForTask(task *Task) {
@@ -125,12 +130,12 @@ func (c *Coordinator) waitForTask(task *Task) {
 
 	<-time.After(time.Second * TaskTimeout)
 
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	if task.Status == Executing {
-		task.Status == NotStarted
-		task.workerId == -1
+		task.Status = NotStarted
+		task.WorkerId = -1
 	}
 }
 
@@ -170,10 +175,10 @@ func (c *Coordinator) Done() bool {
 
 	// Your code here.
 
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	return m.mMap == 0 && m.nReduce == 0
+	return c.nMap == 0 && c.nReduce == 0
 	// return ret
 }
 
@@ -193,12 +198,12 @@ func MakeCoordinator(files []string, nReduce int) *Coordinator {
 
 	for i := 0; i<nMap; i++ {
 		mTask := Task{MapTask, NotStarted, i, files[i], -1}
-		m.mapTasks = append(c.mapTasks, mTask)
+		c.mapTasks = append(c.mapTasks, mTask)
 	}
 
 	for i := 0; i<nReduce; i++ {
-		mTask := Task{ReduceTask, NotStarted, i, files[i], -1}
-		c.reduceTasks = append(c.reduceTasks, mTask)
+		rTask := Task{ReduceTask, NotStarted, i, "", -1}
+		c.reduceTasks = append(c.reduceTasks, rTask)
 	}
 
 	// Your code here.

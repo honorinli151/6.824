@@ -1,0 +1,401 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-apple-darwin11.3.0
+ 
+
+# Make data base, printed on Fri Jul  1 23:37:16 2022
+
+# Variables
+
+# automatic
+ 
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+VSCODE_LOG_NATIVE = false
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /Users/lichenle/Desktop/learning/6.824
+# makefile
+SHELL = /bin/sh
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+_ = /usr/bin/make
+# makefile (from `Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+AUTOJUMP_SOURCED = 1
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+__CFBundleIdentifier = com.microsoft.VSCode
+# environment
+INFOPATH = /opt/homebrew/share/info:
+# environment
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/13/tlx1p8qs2397n56b_skkf9v40000gn/T/vscode-ipc-b515d62d-505e-4aa7-98d3-24c3acef6bd9.sock
+# environment
+VSCODE_CWD = /
+# environment
+GOPROXY = https://proxy.golang.org,direct
+# environment
+PATH = /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+# environment
+LSCOLORS = Gxfxcxdxbxegedabagacad
+# environment
+GOPATH = /Users/lichenle/go
+# environment
+LaunchInstanceID = E0B2EECD-EFE4-43CE-A0AC-570F18F51516
+# environment
+VSCODE_LOG_STACK = false
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
+# environment
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.oy53JYiAMa/Listeners
+# automatic
+%F = $(notdir $%)
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+PWD = /Users/lichenle/Desktop/learning/6.824
+# environment
+HOMEBREW_CELLAR = /opt/homebrew/Cellar
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+MANPATH = /opt/homebrew/share/man::
+# environment
+GOMODCACHE = /Users/lichenle/go/pkg/mod
+# environment
+HOME = /Users/lichenle
+# default
+MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/lichenle/Library/Application Support/Code/CachedData/30d9c6cd9483b2cc586687151bcbcd635f373630
+# environment
+LOGNAME = lichenle
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+ZSH = /Users/lichenle/.oh-my-zsh
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+XPC_FLAGS = 0x0
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# environment
+SHLVL = 1
+# default
+MAKE_VERSION := 3.81
+# environment
+USER = lichenle
+# makefile
+.DEFAULT_GOAL := 
+# environment
+LESS = -R
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# default
+MAKE_COMMAND := /Library/Developer/CommandLineTools/usr/bin/make
+# default
+.VARIABLES := 
+# environment
+TMPDIR = /var/folders/13/tlx1p8qs2397n56b_skkf9v40000gn/T/
+# automatic
+*F = $(notdir $*)
+# environment
+VSCODE_IPC_HOOK = /Users/lichenle/Library/Application Support/Code/1.68.1-main.sock
+# makefile
+MAKEFLAGS = Rrqp
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.352513.352519
+# environment
+HOMEBREW_PREFIX = /opt/homebrew
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# automatic
++F = $(notdir $+)
+# environment
+HOMEBREW_REPOSITORY = /opt/homebrew
+ 
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
+# environment
+COMMAND_MODE = unix2003
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+PAGER = less
+# environment
+LC_ALL = C
+# environment
+SECURITYSESSIONID = 186b2
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+MAKELEVEL := 0
+# environment
+AUTOJUMP_ERROR_PATH = /Users/lichenle/Library/autojump/errors.log
+# environment
+LANG = C
+# environment
+VSCODE_PID = 563
+# makefile (from `Makefile', line 6)
+LABS = " lab1 lab2a lab2b lab2c lab2d lab3a lab3b lab4a lab4b "
+# variable set hash-table stats:
+# Load=78/1024=8%, Rehash=0, Collisions=2/102=2%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 16777231, inode 882710): 8 files, no impossibilities.
+
+# 8 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+%: check-%
+#  commands to execute (from `Makefile', line 9):
+	@echo "Preparing $@-handin.tar.gz"
+	@if echo $(LABS) | grep -q " $@ " ; then \
+	echo "Tarring up your submission..." ; \
+	COPYFILE_DISABLE=1 tar cvzf $@-handin.tar.gz \
+	"--exclude=src/main/pg-*.txt" \
+	"--exclude=src/main/diskvd" \
+	"--exclude=src/mapreduce/824-mrinput-*.txt" \
+	"--exclude=src/main/mr-*" \
+	"--exclude=mrtmp.*" \
+	"--exclude=src/main/diff.out" \
+	"--exclude=src/main/mrcoordinator" \
+	"--exclude=src/main/mrsequential" \
+	"--exclude=src/main/mrworker" \
+	"--exclude=*.so" \
+	Makefile src; \
+	if ! test -e api.key ; then \
+	echo "Missing $(PWD)/api.key. Please create the file with your key in it or submit the $@-handin.tar.gz via the web interface."; \
+	else \
+	echo "Are you sure you want to submit $@? Enter 'yes' to continue:"; \
+	read line; \
+	if test "$$line" != "yes" ; then echo "Giving up submission"; exit; fi; \
+	if test `stat -c "%s" "$@-handin.tar.gz" 2>/dev/null || stat -f "%z" "$@-handin.tar.gz"` -ge 20971520 ; then echo "File exceeds 20MB."; exit; fi; \
+	cat api.key | tr -d '\n' > .api.key.trimmed ; \
+	curl --silent --fail --show-error -F file=@$@-handin.tar.gz -F "key=<.api.key.trimmed" \
+	https://6824.scripts.mit.edu/2022/handin.py/upload > /dev/null || { \
+	echo ; \
+	echo "Submit seems to have failed."; \
+	echo "Please upload the tarball manually on the submission website."; } \
+	fi; \
+	else \
+	echo "Bad target $@. Usage: make [$(LABS)]"; \
+	fi
+	
+
+check-%:
+#  commands to execute (from `Makefile', line 44):
+	@echo "Checking that your submission builds correctly..."
+	@./.check-build git://g.csail.mit.edu/6.824-golabs-2022 $(patsubst check-%,%,$@)
+	
+
+# 2 implicit rules, 0 (0.0%) terminal.
+
+# Files
+
+check-Makefile:
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: `Makefile'
+#  File is an intermediate prerequisite.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 44):
+	@echo "Checking that your submission builds correctly..."
+	@./.check-build git://g.csail.mit.edu/6.824-golabs-2022 $(patsubst check-%,%,$@)
+	
+
+all: check-all
+#  Command-line target.
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: `all'
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/2=0%
+#  commands to execute (from `Makefile', line 9):
+	@echo "Preparing $@-handin.tar.gz"
+	@if echo $(LABS) | grep -q " $@ " ; then \
+	echo "Tarring up your submission..." ; \
+	COPYFILE_DISABLE=1 tar cvzf $@-handin.tar.gz \
+	"--exclude=src/main/pg-*.txt" \
+	"--exclude=src/main/diskvd" \
+	"--exclude=src/mapreduce/824-mrinput-*.txt" \
+	"--exclude=src/main/mr-*" \
+	"--exclude=mrtmp.*" \
+	"--exclude=src/main/diff.out" \
+	"--exclude=src/main/mrcoordinator" \
+	"--exclude=src/main/mrsequential" \
+	"--exclude=src/main/mrworker" \
+ 
+	"--exclude=*.so" \
+	Makefile src; \
+	if ! test -e api.key ; then \
+	echo "Missing $(PWD)/api.key. Please create the file with your key in it or submit the $@-handin.tar.gz via the web interface."; \
+	else \
+	echo "Are you sure you want to submit $@? Enter 'yes' to continue:"; \
+	read line; \
+	if test "$$line" != "yes" ; then echo "Giving up submission"; exit; fi; \
+	if test `stat -c "%s" "$@-handin.tar.gz" 2>/dev/null || stat -f "%z" "$@-handin.tar.gz"` -ge 20971520 ; then echo "File exceeds 20MB."; exit; fi; \
+	cat api.key | tr -d '\n' > .api.key.trimmed ; \
+	curl --silent --fail --show-error -F file=@$@-handin.tar.gz -F "key=<.api.key.trimmed" \
+	https://6824.scripts.mit.edu/2022/handin.py/upload > /dev/null || { \
+	echo ; \
+	echo "Submit seems to have failed."; \
+	echo "Please upload the tarball manually on the submission website."; } \
+	fi; \
+	else \
+	echo "Bad target $@. Usage: make [$(LABS)]"; \
+	fi
+	
+
+.PHONY: check-%
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+check-%:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+Makefile: check-Makefile
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: `Makefile'
+#  Last modified 2022-07-01 22:32:38
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+#  commands to execute (from `Makefile', line 9):
+	@echo "Preparing $@-handin.tar.gz"
+	@if echo $(LABS) | grep -q " $@ " ; then \
+	echo "Tarring up your submission..." ; \
+	COPYFILE_DISABLE=1 tar cvzf $@-handin.tar.gz \
+	"--exclude=src/main/pg-*.txt" \
+	"--exclude=src/main/diskvd" \
+	"--exclude=src/mapreduce/824-mrinput-*.txt" \
+	"--exclude=src/main/mr-*" \
+	"--exclude=mrtmp.*" \
+	"--exclude=src/main/diff.out" \
+	"--exclude=src/main/mrcoordinator" \
+	"--exclude=src/main/mrsequential" \
+	"--exclude=src/main/mrworker" \
+	"--exclude=*.so" \
+	Makefile src; \
+	if ! test -e api.key ; then \
+	echo "Missing $(PWD)/api.key. Please create the file with your key in it or submit the $@-handin.tar.gz via the web interface."; \
+	else \
+	echo "Are you sure you want to submit $@? Enter 'yes' to continue:"; \
+	read line; \
+	if test "$$line" != "yes" ; then echo "Giving up submission"; exit; fi; \
+	if test `stat -c "%s" "$@-handin.tar.gz" 2>/dev/null || stat -f "%z" "$@-handin.tar.gz"` -ge 20971520 ; then echo "File exceeds 20MB."; exit; fi; \
+	cat api.key | tr -d '\n' > .api.key.trimmed ; \
+	curl --silent --fail --show-error -F file=@$@-handin.tar.gz -F "key=<.api.key.trimmed" \
+	https://6824.scripts.mit.edu/2022/handin.py/upload > /dev/null || { \
+	echo ; \
+	echo "Submit seems to have failed."; \
+	echo "Please upload the tarball manually on the submission website."; } \
+	fi; \
+	else \
+	echo "Bad target $@. Usage: make [$(LABS)]"; \
+	fi
+	
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+check-all:
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: `all'
+#  File is an intermediate prerequisite.
+#  File does not exist.
+#  File has been updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := check-all
+# automatic
+# % := 
+# automatic
+# * := all
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/11=9%
+#  commands to execute (from `Makefile', line 44):
+	@echo "Checking that your submission builds correctly..."
+	@./.check-build git://g.csail.mit.edu/6.824-golabs-2022 $(patsubst check-%,%,$@)
+	
+
+# files hash-table stats:
+# Load=8/1024=1%, Rehash=0, Collisions=0/35=0%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+
+# Finished Make data base on Fri Jul  1 23:37:16 2022
+
+ 
