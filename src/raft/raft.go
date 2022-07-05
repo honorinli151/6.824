@@ -50,6 +50,19 @@ type ApplyMsg struct {
 	SnapshotIndex int
 }
 
+type State string
+
+const (
+	Leader	State	= "leader"
+	Candidate		= "candidate"
+	Follower		= "follower"
+)
+
+type LogEntry struct {
+	term	int
+	Command interface{}
+}
+
 //
 // A Go object implementing a single Raft peer.
 //
@@ -64,6 +77,27 @@ type Raft struct {
 	// Look at the paper's Figure 2 for a description of what
 	// state a Raft server must maintain.
 
+	// Persistent states on all servers
+	currentTerm	int
+	votedFor	int
+	logs	[]LogEntry
+
+	// Volatile state on all servers
+	commitIndex	int
+	lastApplied	int
+
+	// Volatile state on leaders
+	nextIndex	[]int
+	matchIndex	[]int
+
+	// Auxiliary states
+	state	State
+	voteCount   int
+	applyCh     chan ApplyMsg
+	winElectCh  chan bool
+	stepDownCh  chan bool
+	grantVoteCh chan bool
+	heartbeatCh chan bool
 }
 
 // return currentTerm and whether this server
@@ -73,7 +107,54 @@ func (rf *Raft) GetState() (int, bool) {
 	var term int
 	var isleader bool
 	// Your code here (2A).
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	term = rf.currentTerm
+	isLeader = rf.state == Leader
+
 	return term, isleader
+}
+
+//
+// get the index of the last log entry.
+// lock must be held before calling this.
+//
+func (rf *Raft) getLastIndex() int {
+	return len(rf.logs) - 1
+}
+
+//
+// get the term of the last log entry.
+// lock must be held before calling this.
+//
+func (rf *Raft) getLastTerm() int {
+	return rf.logs[rf.getLastIndex()].Term
+}
+
+//
+// check if the candidate's log is at least as up-to-date as ours
+// lock must be held before calling this.
+//
+func (rf *Raft) isLogUpToDate(cLastIndex int, cLastTerm int) bool {
+	myLastIndex, myLastTerm := rf.getLastIndex(), rf.getLastTerm()
+
+	if cLastTerm == myLastTerm {
+		return cLastIndex >= myLastIndex
+	}
+	
+	return cLastTerm > myLastTerm
+}
+
+func (rf *Raft) stepDownToFollower(term int) {
+	state := rf.state
+	rf.state = Follower
+	rf.currentTerm = term
+	rf.votedFor = -1
+	// step down if not follower, this check is needed
+	// to prevent race where state is already follower
+	if state != Follower {
+		rf.sendToChannel(rf.stepDownCh, true)
+	}
 }
 
 //
@@ -143,6 +224,10 @@ func (rf *Raft) Snapshot(index int, snapshot []byte) {
 //
 type RequestVoteArgs struct {
 	// Your data here (2A, 2B).
+	term	int
+	candidateId	int
+	lastLogIndex	int
+	lastLogTerm	int
 }
 
 //
@@ -151,6 +236,8 @@ type RequestVoteArgs struct {
 //
 type RequestVoteReply struct {
 	// Your data here (2A).
+	term	int
+	voteGranted	bool
 }
 
 //
@@ -158,6 +245,26 @@ type RequestVoteReply struct {
 //
 func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 	// Your code here (2A, 2B).
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	if args.term < rf.currentTerm {
+		reply.term = rf.currentTerm
+		reply.voteGranted = false
+		return
+	}
+
+	if args.Term > rf.currentTerm {
+		rf.stepDownToFollower(args.Term)
+	}
+
+	reply.Term = rf.currentTerm
+	reply.VoteGranted = false
+	if (rf.votedFor < 0 || rf.votedFor == args.candidateId) && rf.isLogUpToDate(args.LastLogIndex, args.LastLogTerm  {
+		reply.VoteGranted = true
+		rf.votedFor = args.CandidateId
+		rf.sendToChannel(rf.grantVoteCh, true)
+	}
 }
 
 //
