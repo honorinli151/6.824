@@ -254,15 +254,15 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		return
 	}
 
-	if args.Term > rf.currentTerm {
-		rf.stepDownToFollower(args.Term)
+	if args.term > rf.currentTerm {
+		rf.stepDownToFollower(args.term)
 	}
 
-	reply.Term = rf.currentTerm
-	reply.VoteGranted = false
-	if (rf.votedFor < 0 || rf.votedFor == args.candidateId) && rf.isLogUpToDate(args.LastLogIndex, args.LastLogTerm  {
-		reply.VoteGranted = true
-		rf.votedFor = args.CandidateId
+	reply.term = rf.currentTerm
+	reply.voteGranted = false
+	if (rf.votedFor < 0 || rf.votedFor == args.candidateId) && rf.isLogUpToDate(args.lastLogIndex, args.lastLogTerm  {
+		reply.voteGranted = true
+		rf.votedFor = args.candidateId
 		rf.sendToChannel(rf.grantVoteCh, true)
 	}
 }
