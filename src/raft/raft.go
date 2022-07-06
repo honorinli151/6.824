@@ -241,6 +241,29 @@ type RequestVoteReply struct {
 }
 
 //
+// convert the raft state to candidate.
+//
+func (rf *Raft) convertToCandidate(fromState State) {
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+
+	// this check is needed to prevent race
+	// while waiting on multiple channels
+	if rf.state != fromState {
+		return
+	}
+
+	rf.resetChannels()
+	rf.state = Candidate
+	rf.currentTerm++
+	rf.votedFor = rf.me
+	rf.voteCount = 1
+	rf.persist()
+
+	rf.broadcastRequestVote()
+}
+
+//
 // example RequestVote RPC handler.
 //
 func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
@@ -356,9 +379,130 @@ func (rf *Raft) ticker() {
 		// Your code here to check if a leader election should
 		// be started and to randomize sleeping time using
 		// time.Sleep().
+		rf.mu.Lock()
+		state := rf.state
+		rf.mu.Unlock()
+		switch state {
+		case Leader:
+			select {
+			case <-rf.stepDownCh:
+				// state should already be follower
+			case <-time.After(120 * time.Millisecond):
+				rf.mu.Lock()
+				rf.broadcastAppendEntries()
+				rf.mu.Unlock()
+			}
+		case Follower:
+			select {
+			case <-rf.grantVoteCh:
+			case <-rf.heartbeatCh:
+			case <-time.After(rf.getElectionTimeout() * time.Millisecond):
+				rf.convertToCandidate(Follower)
+			}
+		case Candidate:
+			select {
+			case <-rf.stepDownCh:
+				// state should already be follower
+			case <-rf.winElectCh:
+				rf.convertToLeader()
+			case <-time.After(rf.getElectionTimeout() * time.Millisecond):
+				rf.convertToCandidate(Candidate)
+			}
+		}
 
 	}
 }
+
+func (rf *Raft) broadcastAppendEntries() {
+	if rf.state != Leader {
+		return
+	}
+
+	for server := range rf.peers {
+		if server != rf.me {
+			args := AppendEntriesArgs{}
+			args.Term = rf.currentTerm
+			args.LeaderId = rf.me
+			args.PrevLogIndex = rf.nextIndex[server] - 1
+			args.PrevLogTerm = rf.logs[args.PrevLogIndex].Term
+			args.LeaderCommit = rf.commitIndex
+			entries := rf.logs[rf.nextIndex[server]:]
+			args.Entries = make([]LogEntry, len(entries))
+			// make a deep copy of the entries to send
+			copy(args.Entries, entries)
+			go rf.sendAppendEntries(server, &args, &AppendEntriesReply{})
+		}
+	}
+}
+
+func (rf *Raft) sendAppendEntries(server int, args *AppendEntriesArgs, reply *AppendEntriesReply) {
+	ok := rf.peers[server].Call("Raft.AppendEntries", args, reply)
+
+	if !ok {
+		return
+	}
+
+	rf.mu.Lock()
+	defer rf.mu.Unlock()
+	defer rf.persist()
+
+	if rf.state != Leader || args.Term != rf.currentTerm || reply.Term < rf.currentTerm {
+		return
+	}
+
+	if reply.Term > rf.currentTerm {
+		rf.stepDownToFollower(args.Term)
+		return
+	}
+
+	// update matchIndex and nextIndex of the follower
+	if reply.Success {
+		// match index should not regress in case of stale rpc response
+		newMatchIndex := args.PrevLogIndex + len(args.Entries)
+		if newMatchIndex > rf.matchIndex[server] {
+			rf.matchIndex[server] = newMatchIndex
+		}
+		rf.nextIndex[server] = rf.matchIndex[server] + 1
+	} else if reply.ConflictTerm < 0 {
+		// follower's log shorter than leader's
+		rf.nextIndex[server] = reply.ConflictIndex
+		rf.matchIndex[server] = rf.nextIndex[server] - 1
+	} else {
+		// try to find the conflictTerm in log
+		newNextIndex := rf.getLastIndex()
+		for ; newNextIndex >= 0; newNextIndex-- {
+			if rf.logs[newNextIndex].Term == reply.ConflictTerm {
+				break
+			}
+		}
+		// if not found, set nextIndex to conflictIndex
+		if newNextIndex < 0 {
+			rf.nextIndex[server] = reply.ConflictIndex
+		} else {
+			rf.nextIndex[server] = newNextIndex
+		}
+		rf.matchIndex[server] = rf.nextIndex[server] - 1
+	}
+
+	// if there exists an N such that N > commitIndex, a majority of
+	// matchIndex[i] >= N, and log[N].term == currentTerm, set commitIndex = N
+	for n := rf.getLastIndex(); n >= rf.commitIndex; n-- {
+		count := 1
+		if rf.logs[n].Term == rf.currentTerm {
+			for i := 0; i < len(rf.peers); i++ {
+				if i != rf.me && rf.matchIndex[i] >= n {
+					count++
+				}
+			}
+		}
+		if count > len(rf.peers) / 2 {
+			rf.commitIndex = n
+			go rf.applyLogs()
+			break
+		}
+	}
+}
+
 
 //
 // the service or tester wants to create a Raft server. the ports
@@ -379,6 +523,18 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	rf.me = me
 
 	// Your initialization code here (2A, 2B, 2C).
+	rf.state = Follower
+	rf.currentTerm = 0
+	rf.votedFor = -1
+	rf.voteCount = 0
+	rf.commitIndex = 0
+	rf.lastApplied = 0
+	rf.applyCh = applyCh
+	rf.winElectCh = make(chan bool)
+	rf.stepDownCh = make(chan bool)
+	rf.grantVoteCh = make(chan bool)
+	rf.heartbeatCh = make(chan bool)
+	rf.logs = append(rf.logs, LogEntry{term: 0})
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
